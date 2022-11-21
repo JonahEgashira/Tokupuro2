@@ -16,9 +16,11 @@ subject_name = char(subject(1));
 %サンプリング周波数
 fs = 1000;
 
+%TODO: Read data from /data/$name$.mat
+
 %解析するデータ（matファイル）を選択し、読み込む
-[fname pname]=uigetfile('*.mat','解析するデータを選択してください')
-  FP=[fname pname]
+[fname, pname] = uigetfile('*.mat','解析するデータを選択してください');
+  FP = [fname pname];
   if fname==0;return;end
    %fnameがファイル名／pnameはファイルのある場所（ディレクトリ）
    load([pname fname]);
@@ -28,7 +30,7 @@ data_filtered = data;
 %ハムカットフィルタ
 [b50,a50] = butter(3,[49 51]/500,'stop');
 [b100,a100] = butter(3,[99 101]/500,'stop');
-[b150,a150] = butter(3,[149 151]/500,'stop')
+[b150,a150] = butter(3,[149 151]/500,'stop');
 [b200,a200] = butter(3,[199 201]/500,'stop');
 [b250,a250] = butter(3,[249 251]/500,'stop');
 [b300,a300] = butter(3,[299 301]/500,'stop');
@@ -44,7 +46,7 @@ data_filtered = filtfilt(b300,a300,data_filtered);
 data_filtered = filtfilt(b350,a350,data_filtered);
 data_filtered = filtfilt(b400,a400,data_filtered);
 data_filtered = filtfilt(b450,a450,data_filtered);
- 
+
  %計測データの定義
  Force = data_filtered(:,1);
  EMG = data_filtered(:,2);
@@ -60,7 +62,7 @@ data_filtered = filtfilt(b450,a450,data_filtered);
  time = 0:1/fs:length(Force)/fs-1/fs;
  
  %生波形を描画
- figure = figure('Position',[1 1 500 700])
+ figure = figure('Position',[1 1 500 700]);
  subplot(2,1,1)
  plot(time,Force);
  ylabel('Force (V)','FontName','Arial','Fontsize',12);
@@ -75,11 +77,11 @@ data_filtered = filtfilt(b450,a450,data_filtered);
  
 
 %解析対象区間を設定
-%安定した2秒間のデータを計算
+%安定した2秒間Forceのデータを計算
 defaultanswer = {'5','7'};
 startend = inputdlg({'start','end'},'解析区間の2秒を設定してください',1,defaultanswer);
-start_time = str2num(char(startend(1)));
-end_time = str2num(char(startend(2)));
+start_time = str2double(char(startend(1))); % used to be str2num
+end_time = str2double(char(startend(2))); % used to be str2num
 
 %解析対象区間の2秒分のデータを切り出し
 Force = Force(start_time*fs+1:end_time*fs);
